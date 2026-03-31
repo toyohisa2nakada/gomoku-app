@@ -133,8 +133,8 @@ class Game {
     }
 }
 
-import { mtcs } from "./mtcs.js";
-mtcs.game = new Game();
+import { mcts } from "./mcts.js";
+mcts.game = new Game();
 export function next_ai(state) {
-    return mtcs.next_ai({ cells: state.data, p0_q: -1 }, -1, 2000);
+    return mcts.next_ai({ cells: state.data, p0_q: -1 }, -1, 2000);
 }
