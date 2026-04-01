@@ -2,20 +2,22 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <link rel="stylesheet" href="./style.css">
 </head>
 
 <!-- importをしているのでローカルサーバ上で開く必要がある。 -->
 
-<body class="bg-gray-100 p-8 font-sans flex justify-center items-start min-h-screen">
-    <div id="dialog" title="Gomoku" class="p-6 bg-white rounded-xl shadow-lg inline-block">
-        <div class="flex items-start gap-6">
-            <div id="canvas-wrapper" class="w-[120px] h-[120px]">
-                <canvas id="dlg-canvas" class="block bg-white border border-gray-200"></canvas>
+<body class="bg-gray-100 p-4 sm:p-8 font-sans flex justify-center items-start min-h-screen">
+    <div id="dialog" title="Gomoku" class="p-4 sm:p-6 bg-white rounded-xl shadow-lg w-full max-w-[450px]">
+        <div class="flex flex-col items-center gap-6 w-full">
+            <div id="canvas-wrapper" class="w-full aspect-square relative">
+                <canvas id="dlg-canvas" class="absolute inset-0 w-full h-full block bg-white border border-gray-200 shadow-sm rounded-md"></canvas>
             </div>
             <button id="start"
-                class="px-5 py-2.5 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors shadow-sm">Start</button>
+                class="w-full sm:w-auto px-6 py-3.5 sm:px-5 sm:py-2.5 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors shadow-sm text-lg sm:text-base">Start</button>
         </div>
         <div id="status" class="mt-6 px-4 py-3 text-center font-bold rounded-lg shadow-inner"></div>
     </div>
@@ -37,13 +39,29 @@
                 const canvas = document.getElementById(this.params.canvas_id);
                 this.ctx = canvas.getContext('2d');
                 canvas.addEventListener("click", e => this.onClick(e), false);
-                document.getElementById(this.params.canvas_id).width = document.getElementById(this.params.canvas_wrapper_id).clientWidth;
-                document.getElementById(this.params.canvas_id).height = document.getElementById(this.params.canvas_wrapper_id).clientHeight;
+                
+                const resizeCanvas = () => {
+                    const wrapper = document.getElementById(this.params.canvas_wrapper_id);
+                    const rect = wrapper.getBoundingClientRect();
+                    const dpr = window.devicePixelRatio || 1;
+                    
+                    // Physical pixels
+                    canvas.width = rect.width * dpr;
+                    canvas.height = rect.height * dpr;
+                    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // scale considering device pixel ratio
+                    
+                    // Logical pixels for coordinates
+                    this.screen_width = rect.width;
+                    this.screen_height = rect.height;
+                    this.params.cell_width = Math.trunc(rect.width / this.params.cell_size);
+                    this.params.cell_height = Math.trunc(rect.height / this.params.cell_size);
+                    
+                    if (this.values) this.draw();
+                };
 
-                this.screen_width = canvas.width;
-                this.screen_height = canvas.height;
-                this.params.cell_width = Math.trunc(canvas.width / this.params.cell_size);
-                this.params.cell_height = Math.trunc(canvas.height / this.params.cell_size);
+                window.addEventListener("resize", resizeCanvas);
+                resizeCanvas();
+
                 this.setTurn(0);
                 const button_start = document.getElementById(this.params.start_id);
                 button_start.addEventListener("click", e => this.onStart(e), false);
