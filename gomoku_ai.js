@@ -1,4 +1,5 @@
-const params = { length: 8, n_pieces: 4 };
+// setAiParamsで上書きする
+let params = { length: 5, n_pieces: 4 };
 
 // 勝者判定
 function judge(cells, length = params.length, n_pieces = params.n_pieces) {
@@ -136,5 +137,9 @@ class Game {
 import { mcts } from "./mcts.js";
 mcts.game = new Game();
 export function next_ai(state) {
-    return mcts.next_ai({ cells: state.data, p0_q: -1 }, -1, 2000);
+    return mcts.next_ai({ cells: state.data, p0_q: -1 }, -1, 10000);
+}
+export function setAiParams(p){
+    params = {...params,...p};
+    console.log(params);
 }

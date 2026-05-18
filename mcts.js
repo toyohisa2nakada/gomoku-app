@@ -130,7 +130,7 @@ export class mcts {
         return newState;
     }
 
-    static next_ai(state, pid, n = 7000) {
+    static next_ai(state, pid, n) {
         const cs = new State(mcts.game, state, pid, true);
         cs.set_css_index(0);
         mcts.css = [cs];
